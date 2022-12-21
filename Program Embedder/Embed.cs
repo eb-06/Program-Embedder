@@ -8,8 +8,8 @@ namespace Program_Embedder
 {
     internal class Embed
     {
-        public static string activeProcess;
-        private static IntPtr dockedWindow;
+        public static string activeProcess = "";
+        private static IntPtr dockedWindow = IntPtr.Zero;
 
         public static void ReSize(Panel panel) => Win32.MoveWindow(dockedWindow, 0, 0, panel.Width, panel.Height, true);
 
