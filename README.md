@@ -1,5 +1,5 @@
 ## What is the use of this?
-* It allows you to embed **external** programs within your programs panel by default. `(This can be changed within the code.)` 
+* It allows you to embed **external** programs within your programs panel by default.
 * This allows for easier navigation and mutli-tasking all controlled within one program.
 
 ## Examples:
