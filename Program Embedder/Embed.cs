@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -11,22 +11,7 @@ namespace Program_Embedder
         public static string activeProcess;
         private static IntPtr dockedWindow;
 
-        [DllImport("user32.dll")]
-        static extern IntPtr SetParent(IntPtr windowChild, IntPtr newWindowParent);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool MoveWindow(IntPtr window, int x, int y, int width, int height, bool image);
-
-        [DllImport("user32.DLL")]
-        private static extern int SetWindowLong(IntPtr window, int index, int newLong);
-
-        [DllImport("user32.dll")]
-        private static extern bool ShowWindowAsync(IntPtr window, int windowShow);
-
-        [DllImport("user32.DLL")]
-        private static extern int GetWindowLong(IntPtr window, int index);
-
-        public static void ReSize(Panel panel) => MoveWindow(dockedWindow, 0, 0, panel.Width, panel.Height, true);
+        public static void ReSize(Panel panel) => Win32.MoveWindow(dockedWindow, 0, 0, panel.Width, panel.Height, true);
 
         public static void Open(Panel panel)
         {
@@ -34,18 +19,22 @@ namespace Program_Embedder
             {
                 if (fileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    Process process = Process.Start(fileDialog.FileName);
-                    process.WaitForInputIdle();
-                    dockedWindow = process.MainWindowHandle;
-                    while (process.MainWindowHandle == IntPtr.Zero)
+                    using (Process process = Process.Start(fileDialog.FileName))
                     {
-                        Thread.Sleep(100);
-                        process.Refresh();
+                        process.WaitForInputIdle();
+                        dockedWindow = process.MainWindowHandle;
+
+                        while (process.MainWindowHandle == IntPtr.Zero)
+                        {
+                            Thread.Sleep(100);
+                            process.Refresh();
+                        }
+
+                        Win32.SetParent(process.MainWindowHandle, panel.Handle);
+                        Win32.SetWindowLong(process.MainWindowHandle, -16, Win32.GetWindowLong(process.MainWindowHandle, 0x00800000));
+                        Win32.ShowWindowAsync(process.MainWindowHandle, 3);
+                        activeProcess = process.ProcessName;
                     }
-                    SetParent(process.MainWindowHandle, panel.Handle);
-                    SetWindowLong(process.MainWindowHandle, -16, GetWindowLong(process.MainWindowHandle, 0x00800000));
-                    ShowWindowAsync(process.MainWindowHandle, 3);
-                    activeProcess = process.ProcessName;
                 }
             }
         }
