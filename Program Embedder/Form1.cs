@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Windows.Forms;
 
@@ -17,8 +17,7 @@ namespace Program_Embedder
             if (Process.GetProcessesByName(Embed.activeProcess).Length == 0) Embed.Open(panel1);
             else
             {
-                DialogResult dialogResult = MessageBox.Show("A program is already embedded. Do you want to close the current one and load another?", "Active Program", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                if (dialogResult == DialogResult.Yes)
+                if (MessageBox.Show("A program is already embedded. Do you want to close the current one and load another?", "Active Program", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
                     Embed.Close(Embed.activeProcess);
                     Embed.Open(panel1);
